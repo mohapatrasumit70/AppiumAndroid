@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="LOG_DIR">${sys:user.dir}/logs</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="CONSOLE_PATTERN">%d{HH:mm:ss.SSS} %-5level [%t] %C{1}.%M() — %msg%n</Property>
+    </Properties>
+
+    <Appenders>
+
+        <!-- ── Console Appender ── -->
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${CONSOLE_PATTERN}"/>
+        </Console>
+
+        <!-- ── Rolling File Appender (daily + size-based rollover) ── -->
+        <RollingFile name="FileAppender"
+                     fileName="${LOG_DIR}/framework.log"
+                     filePattern="${LOG_DIR}/archive/framework-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="30"/>
+        </RollingFile>
+
+        <!-- ── Test-run specific log (new file per run) ── -->
+        <RollingFile name="TestRunAppender"
+                     fileName="${LOG_DIR}/test-run.log"
+                     filePattern="${LOG_DIR}/archive/test-run-%d{yyyy-MM-dd_HH-mm-ss}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+            </Policies>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+
+        <!-- Framework package — DEBUG level -->
+        <Logger name="com.company" level="DEBUG" additivity="false">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+            <AppenderRef ref="TestRunAppender"/>
+        </Logger>
+
+        <!-- Appium/Selenium — suppress noisy INFO -->
+        <Logger name="io.appium"           level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+        <Logger name="org.openqa.selenium" level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+        <Logger name="org.apache.http"     level="WARN" additivity="false">
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <!-- Root -->
+        <Root level="INFO">
+            <AppenderRef ref="ConsoleAppender"/>
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>

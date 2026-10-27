@@ -1,0 +1,23 @@
+# Maven
+target/
+
+# Reports & Logs (generated at runtime)
+reports/
+logs/
+screenshots/
+allure-results/
+
+# IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# APK files
+*.apk
+*.aab
